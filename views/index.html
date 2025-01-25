@@ -24,12 +24,11 @@
       margin: auto;
       border: 5px solid wheat;
       border-radius: 5px;
-      
     }
 
     .data{
       display: grid;
-      grid-template-columns: auto auto;
+      grid-template-columns: auto auto auto;
       justify-content: space-evenly;
       
     }
@@ -42,29 +41,85 @@
     span{
       min-width: 100px;
     }
+    .data:nth-child(1){
+     background-color: gold;
+    }
+    .data:nth-child(2){
+     background-color: silver;
+    }
+    .data:nth-child(3){
+     background-color: #CD7F32;
+    }
     
 
   </style>
 
     <div id="container">
-          <% title.keys().forEach(element => {
+          <% data.keys().forEach((element,index) => {
             { %>
-            <div class="data"><span><%= element %></span><span id="<%= element%>"><%= title.get(element)%></span></div>
+            <div class="data"><span id="medal"><%= index+1 %></span> <span><%= element %></span><span id="<%= element%>"><%= data.get(element)%></span></div>
             <%} 
           }); %>        
     </div>
     <button onclick="SendData()">KULD</button>
     <input type="text" id="identifier">
     
-    <button onclick="UjAdat()">Uj ID</button>
+    <button onclick="NewUser()">Uj ID</button>
     <input type="text" id="newid">
 
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <script>
-      const arr = new Map(<%- JSON.stringify([...title]) %>)
+      const arr = new Map(<%- JSON.stringify([...data]) %>)
       
      
   
+    
+
+    const socket = io();
+
+    socket.on("change",(msg)=>{
+      arr.set(msg,arr.get(msg)+1)
+      document.getElementById(msg).innerHTML=arr.get(msg)
+      
+      const sortedMap=SortMap()
+
+      var list=GenerateRows(sortedMap)
+      
+      document.getElementById("container").innerHTML=''
+      for (let i = list.length-1; i > -1; i--) {
+        console.log(list[i])
+        document.getElementById("container").appendChild(list[i])
+      }
+    })
+    
+    socket.on("newID",(msg)=>{
+      arr.set(msg,0)
+      
+      AppendToContainer(msg)
+    })
+
+    function AppendToContainer(msg){
+      var div=document.createElement("div")
+      div.classList.add("data")
+
+      var medal=document.createElement("span")
+      medal.innerHTML=arr.size
+      medal.id="medal"
+
+      var id=document.createElement("span")
+      id.innerHTML=msg
+
+      var num=document.createElement("span")
+      num.innerHTML=0
+      num.id=msg
+
+      div.appendChild(medal)
+      div.appendChild(id)
+      div.appendChild(num)
+      
+      document.getElementById("container").appendChild(div)
+    }
+
     function SendData() {
     
     var data={"id":document.getElementById("identifier").value}
@@ -75,31 +130,27 @@
 
   }
 
-  function UjAdat(){
+  function NewUser(){
     var data = {"id":document.getElementById("newid").value}
     fetch("/new_reader",{body:JSON.stringify(data),method:"POST",headers: {
     'Content-Type': 'application/json',
   }})
   }
 
-    const socket = io();
-
-    socket.on("change",(msg)=>{
-      arr.set(msg,arr.get(msg)+1)
-      document.getElementById(msg).innerHTML=arr.get(msg)
-      
+    function SortMap(){
       const sortedEntries = Array.from(arr).sort((a, b) => {
-        console.log(a,b)
         return a[1] - b[1]
       });
-      console.log(sortedEntries)
+      
       const sortedMap = new Map(sortedEntries)
+      return sortedMap
+    }
 
-      var list=[]
-      
-      
+    function GenerateRows(sortedMap){
+      let list=[]
+      let i=arr.size+1
       sortedMap.forEach((v,k)=>{
-        
+        i--
 
         var el2=document.createElement("span")
         el2.innerHTML=v
@@ -108,42 +159,24 @@
        
         var el1=document.createElement("span")
         el1.innerHTML=k
+
+        var el3=document.createElement("span")
+        el3.innerHTML=i
+        el3.id="medal"
+
         
 
         var div=document.createElement("div")
         div.classList.add("data")
+        div.appendChild(el3)
         div.appendChild(el1)
         div.appendChild(el2)
         list.push(div)
         
-    
+        
       })
-      document.getElementById("container").innerHTML=''
-      for (let i = list.length-1; i > -1; i--) {
-        console.log(list[i])
-        document.getElementById("container").appendChild(list[i])
-      }
-    })
-    
-    socket.on("newID",(msg)=>{
-      arr.set(msg,0)
-
-      var div=document.createElement("div")
-      div.classList.add("data")
-
-      var span=document.createElement("span")
-      span.innerHTML=msg
-
-      var span2=document.createElement("span")
-      span2.innerHTML=0
-      span2.id=msg
-
-      div.appendChild(span)
-      div.appendChild(span2)
-      document.getElementById("container").appendChild(div)
-
-      return
-    })
+      return list
+    }
     </script>
 </body>
 </html>

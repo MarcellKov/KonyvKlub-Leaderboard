@@ -17,15 +17,17 @@ const app=express()
 const MainServer=createServer(app)
 const io=new Server(MainServer)
 
-
+app.use(cors({origin:"http://localhost:5000"}))
 app.use(express.json())
 app.use("/read_book",ratelimiter({
-    windowMs:1000*5*100,
+    windowMs:1000 * 60 * 30,
     limit:1000
 }))
+
 app.set('view engine', "ejs")
 app.engine('html', renderFile);
 
+// Firebase inicializálása
 const firebaseConfig = {
     apiKey: process.env.apiKey,
     authDomain:  process.env.authDomain,
@@ -41,29 +43,10 @@ const FirebaseApp = initializeApp(firebaseConfig);
 
 const RTDB=getDatabase(FirebaseApp)
 
-
-onChildChanged(query(ref(RTDB,"leaderboard")),(snapshot)=>{
-    console.log(snapshot.toJSON())
-    console.log(snapshot.ref.key)
-})
-
 app.get("/",async (req,res)=>{
-    var processed=new Map()
-
-    var data=(await get(query(ref(RTDB,"leaderboard")))).forEach(function(e){
-        processed.set(e.key,e.val()["num"])
-    })
-    
-    console.log(processed)
-    
-    const sortedEntries = Array.from(processed).sort((a, b) => {
-        console.log(a,b)
-        return b[1] - a[1]
-      });
-      console.log(sortedEntries)
-      const sortedMap = new Map(sortedEntries)
+    var sortedmap=SortMap(await GetAllUsers())
         
-    res.render("index.html",{"title":sortedMap})
+    res.render("index.html",{"data":sortedmap})
     return
 })
 
@@ -72,20 +55,44 @@ app.post("/read_book",(req,res)=>{
     
     update(ref(RTDB,`leaderboard/${id}`),{"num":increment(1),})
     io.emit("change",id)
-    res.send("Success")
-    return
+
+    return res.sendStatus(200)
+    
 })
 
 app.post("/new_reader",(req,res)=>{
     let id=req.body["id"]
+
     set(ref(RTDB,`leaderboard/${id}`),{"num":0})
+
     io.emit("newID",id)
 })
 
 io.on("connection",(socket)=>{
-    console.log("Joined")
+    console.log("SocketIO: "+"Egy felhasználó csatlakozott")
 })
 
 
 
 MainServer.listen(5000)
+
+function SortMap(data){
+    var processed=new Map()
+
+    data.forEach(function(e){
+        processed.set(e.key,e.val()["num"])
+    })
+
+    const sortedEntries = Array.from(processed).sort((a, b) => {
+        return b[1] - a[1]
+      });
+
+      
+      const sortedMap = new Map(sortedEntries)
+      
+      return sortedMap
+}
+
+async function GetAllUsers(){
+    return (await get(query(ref(RTDB,"leaderboard"))))
+}
