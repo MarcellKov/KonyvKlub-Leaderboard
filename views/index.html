@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div>
+          <% title.forEach(element => {
+            { %>
+            <li><%= element %></li>
+          <% } 
+          }); %>        
+    </div>
+    <button onclick="SendData({'id':'JohnDoe'})">KULD</button>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script>
+
+    function SendData(param) {
+    console.log(param)
+     fetch("/read_book",{body:JSON.stringify(param),method:"POST",headers: {
+    'Content-Type': 'application/json',
+  }})
+
+    }
+
+    const socket = io();
+    </script>
+</body>
+</html>
