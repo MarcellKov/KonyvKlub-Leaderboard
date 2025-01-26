@@ -91,7 +91,9 @@ io.on("connection",(socket)=>{
 })
 
 
-MainServer.listen(5000)
+MainServer.listen(5000,'0.0.0.0',()=>{
+    console.log("SERVER IS UP")
+})
 
 //Függvények
 

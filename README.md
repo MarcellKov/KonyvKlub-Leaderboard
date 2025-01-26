@@ -1,8 +1,8 @@
 Az Alkalmazás Futtatása:
 
-1. lépés: Dependecyk telepítése a következő paranccsal: npm ci
+1. lépés: Dependencyk telepítése a következő paranccsal: npm ci
 
-2. lépés: Alkalmazás futtatása: nodemon index.js
+2. lépés: Alkalmazás futtatása: node index.js
 
 3. Az alkalmazás http://localhost:5000/ címen fut.
 

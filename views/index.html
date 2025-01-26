@@ -39,7 +39,9 @@
       background-color: burlywood;
     }
     span{
-      min-width: 100px;
+      min-width: 200px;
+      max-width: 200px;
+      overflow: hidden;
     }
     .data:nth-child(1){
      background-color: gold;
@@ -57,17 +59,20 @@
     <div id="container">
           <% data.keys().forEach((element,index) => {
             { %>
-            <div class="data"><span id="medal"><%= index+1 %></span> <span><%= element %></span><span id="<%= element%>"><%= data.get(element)%></span></div>
+            <div class="data"><span id="medal"><%= index+1 %></span> <span><%= element %></span><span id="<%= element%>"><%= data.get(element)%>📚</span></div>
             <%} 
           }); %>        
     </div>
     <!-- Ha nem akartok postmannel vagy mással tesztelni hagytam pár gombot amivel tudjátok növelni az olvasott könyvek számát, és hozzáadni új felhasználót -->
     <!--Beírsz egy nevet és annak a felhasználónak növeli a könyveit egyel, viszont ugyanígy be is tudsz szúrni új felhasználót a második gombbal -->
+    <div style="display: flex;justify-content: center; margin: 5%;">
+    
     <button onclick="SendData()">KULD</button>
-    <input type="text" id="identifier">
+    <input type="text" id="identifier" style="margin-right: 1%;">
     
     <button onclick="NewUser()">Uj ID</button>
     <input type="text" id="newid">
+    </div>
 
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <script>
@@ -115,7 +120,7 @@
       id.innerHTML=msg
 
       var num=document.createElement("span")
-      num.innerHTML=0
+      num.innerHTML=0+"📚"
       num.id=msg
 
       div.appendChild(medal)
@@ -158,7 +163,7 @@
         i--
 
         var el2=document.createElement("span")
-        el2.innerHTML=v
+        el2.innerHTML=v+"📚"
         el2.id=k
         
        
