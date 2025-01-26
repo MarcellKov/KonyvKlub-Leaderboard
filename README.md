@@ -2,9 +2,13 @@ Az Alkalmazás Futtatása:
 
 1. lépés: Dependencyk telepítése a következő paranccsal: npm ci
 
-2. lépés: Alkalmazás futtatása: node index.js
+2. Alkalmazás futtatása: node index.js
 
 3. Az alkalmazás http://localhost:5000/ címen fut.
+
+4. A bal oldali gombbal és input fielddel növelni tudjátok az elolvasott könyvek számát, ha beírjátok a megfelelő nevet
+
+5. A jobb oldali gombbal új olvasót tudtok felvenni az adatbázisba, az olvasó nevét a mellette lévő input fieldbe írd be
 
 
 Az Alkalmazás Felépítése:
