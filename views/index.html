@@ -53,7 +53,7 @@
     
 
   </style>
-
+  <!--Végigmegyünk az összes felhasználói adaton, és megjelenítjük a helyezését, nevét, és az olvasott könyvek számát-->
     <div id="container">
           <% data.keys().forEach((element,index) => {
             { %>
@@ -61,6 +61,8 @@
             <%} 
           }); %>        
     </div>
+    <!-- Ha nem akartok postmannel vagy mással tesztelni hagytam pár gombot amivel tudjátok növelni az olvasott könyvek számát, és hozzáadni új felhasználót -->
+    <!--Beírsz egy nevet és annak a felhasználónak növeli a könyveit egyel, viszont ugyanígy be is tudsz szúrni új felhasználót a második gombbal -->
     <button onclick="SendData()">KULD</button>
     <input type="text" id="identifier">
     
@@ -74,9 +76,10 @@
      
   
     
-
+      <!--Csatlakoztatjuk a klienst a SocketIO szerverhez, mivel same origin ezért nem kell paramétert megadni-->
     const socket = io();
 
+    <!--Változás listener, ha történik változás az olvasott könyvek számában, akkor a MAP-ot amiben tároljuk az adatokat frissíti, majd ez alapján újragenerálja a listát-->
     socket.on("change",(msg)=>{
       arr.set(msg,arr.get(msg)+1)
       document.getElementById(msg).innerHTML=arr.get(msg)
@@ -92,12 +95,14 @@
       }
     })
     
+    <!--Ha érkezik egy új olvasó, akkor felveszi a lista végére, mert még nem olvasott könyvet-->
     socket.on("newID",(msg)=>{
       arr.set(msg,0)
       
       AppendToContainer(msg)
     })
 
+    <!--Függvények-->
     function AppendToContainer(msg){
       var div=document.createElement("div")
       div.classList.add("data")
